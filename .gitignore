@@ -1,0 +1,10 @@
+# Directories
+.idea
+.vscode
+build
+vendor
+tmp
+
+# Files
+.DS_Store
+.env
