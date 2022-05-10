@@ -6,7 +6,7 @@ WORKDIR /src
 # ENV CGO_ENABLED=0
 
 RUN apk add git
-COPY go.* .
+COPY go.* ./
 RUN go mod download
 
 FROM base AS build
