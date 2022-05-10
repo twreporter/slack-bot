@@ -1,5 +1,5 @@
 all: bin/bot
-test: unit-test
+test: lint test
 
 PLATFORM=local
 
@@ -9,6 +9,10 @@ bin/bot:
 	--output bin/ \
 	--platform ${PLATFORM}
 
-.PHONY: unit-test
+.PHONY: test
 unit-test:
 	@docker build . --target unit-test
+
+.PHONY: lint
+lint:
+	@docker build . --target lint
