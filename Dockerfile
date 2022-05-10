@@ -1,21 +1,20 @@
-## syntax = docker/dockerfile:1-experimental
+# # syntax = docker/dockerfile:1-experimental
 
 # FROM --platform=${BUILDPLATFORM} golang:1.18-alpine AS base
-FROM golang:1.18-alpine AS base
-WORKDIR /src
-# ENV CGO_ENABLED=0
+# WORKDIR /src
+# # ENV CGO_ENABLED=0
 
-RUN apk add git
-COPY go.* ./
-RUN go mod download
+# RUN apk add git
+# COPY go.* ./
+# RUN go mod download
 
-FROM base AS build
+# FROM base AS build
 # ARG TARGETOS
 # ARG TARGETARCH
-RUN --mount=target=. \
-    --mount=type=cache,target=/root/.cache/go-build \
-    # GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
-    go build -o /out/bot .
+# RUN --mount=target=. \
+#     --mount=type=cache,target=/root/.cache/go-build \
+#     GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+#     go build -o /out/bot .
 
 # FROM base AS unit-test
 # RUN --mount=target=. \
@@ -41,6 +40,11 @@ RUN --mount=target=. \
 # COPY --from=build /out/bot /bot.exe
 
 # FROM bin-${TARGETOS} AS bin
+
+FROM golang:1.18-alpine AS build
+WORKDIR /src
+COPY . .
+RUN go build -o /out/bot .
 
 FROM alpine:3.12 AS run
 
