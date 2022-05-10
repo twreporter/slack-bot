@@ -1,6 +1,7 @@
-# syntax = docker/dockerfile:1-experimental
+## syntax = docker/dockerfile:1-experimental
 
-FROM --platform=${BUILDPLATFORM} golang:1.18-alpine AS base
+# FROM --platform=${BUILDPLATFORM} golang:1.18-alpine AS base
+FROM golang:1.18-alpine AS base
 WORKDIR /src
 # ENV CGO_ENABLED=0
 
@@ -9,11 +10,11 @@ COPY go.* .
 RUN go mod download
 
 FROM base AS build
-ARG TARGETOS
-ARG TARGETARCH
+# ARG TARGETOS
+# ARG TARGETARCH
 RUN --mount=target=. \
     --mount=type=cache,target=/root/.cache/go-build \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+    # GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
     go build -o /out/bot .
 
 # FROM base AS unit-test
