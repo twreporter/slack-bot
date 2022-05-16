@@ -20,13 +20,26 @@ func main() {
 	godotenv.Load(".env")
 	token := os.Getenv("SLACK_AUTH_TOKEN")
 	appToken := os.Getenv("SLACK_APP_TOKEN")
+	appEnv := os.Getenv("APP_ENV")
 
-	// Set debug to true for dev
-	client := slack.New(token, slack.OptionDebug(true), slack.OptionAppLevelToken(appToken))
+	var devMode bool
+	switch appEnv {
+	case "production":
+	case "stage":
+		devMode = false
+	case "dev":
+	case "development":
+	case "local":
+	default:
+		devMode = true
+	}
+
+	// New Slack bot
+	client := slack.New(token, slack.OptionDebug(devMode), slack.OptionAppLevelToken(appToken))
 	// Enable Socket Mode
 	socketClient := socketmode.New(
 		client,
-		socketmode.OptionDebug(true),
+		socketmode.OptionDebug(devMode),
 		// Custom logger
 		socketmode.OptionLog(log.New(os.Stdout, "socketmode: ", log.Lshortfile|log.LstdFlags)),
 	)
