@@ -4,6 +4,7 @@
 build
 vendor
 tmp
+bin/*
 
 # Files
 .DS_Store
