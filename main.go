@@ -1,10 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -66,7 +70,6 @@ func main() {
 					// log.Println(eventsAPIEvent)
 					err := handleEventMessage(eventsAPIEvent, client)
 					if err != nil {
-						//TODO: actual err handeling
 						log.Fatal(err)
 					}
 
@@ -150,8 +153,6 @@ func handleAppMentionEvent(event *slackevents.AppMentionEvent, client *slack.Cli
 		attachment.Color = "#3d3d3d"
 	}
 
-	//TODO
-
 	_, _, err = client.PostMessage(event.Channel, slack.MsgOptionAttachments(attachment))
 	if err != nil {
 		return fmt.Errorf("failed to post message: %w", err)
@@ -175,7 +176,7 @@ func handleSyncCommand(command slack.SlashCommand, client *slack.Client) error {
 	attachment := slack.Attachment{}
 	attachment.Fields = []slack.AttachmentField{
 		{
-			Title: "ID",
+			Title: "Email",
 			Value: command.Text,
 		}, {
 			Title: "Date",
@@ -186,10 +187,29 @@ func handleSyncCommand(command slack.SlashCommand, client *slack.Client) error {
 		},
 	}
 
-	attachment.Text = fmt.Sprintf("Syncing to netiCRM...")
+	postBody, _ := json.Marshal(map[string]string{
+		"id":   command.Text,
+		"type": "user",
+	})
+	responseBody := bytes.NewBuffer(postBody)
+	resp, err := http.Post("https://NETICRM_API_ENDPOINT/sync", "application/json", responseBody)
+
+	if err != nil {
+		log.Fatalf("An Error Occured %v", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	sb := string(body)
+
+	attachment.Text = fmt.Sprintf("Syncing [%s] to netiCRM...", command.Text)
+	attachment.Pretext = sb
 	attachment.Color = "#AA0000"
 
-	_, _, err := client.PostMessage(command.ChannelID, slack.MsgOptionAttachments(attachment))
+	_, _, err = client.PostMessage(command.ChannelID, slack.MsgOptionAttachments(attachment))
 	if err != nil {
 		return fmt.Errorf("failed to post message: %w", err)
 	}
