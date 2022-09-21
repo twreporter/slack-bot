@@ -149,7 +149,7 @@ func handleAppMentionEvent(event *slackevents.AppMentionEvent, client *slack.Cli
 		attachment.Color = "#4af030"
 	} else {
 		attachment.Text = fmt.Sprintf("How can I help you %s?", user.Name)
-		attachment.Pretext = "`/sync [id]` for netiCRM sync-tool"
+		attachment.Pretext = "`/sync [email]` for netiCRM sync-tool"
 		attachment.Color = "#3d3d3d"
 	}
 
@@ -261,3 +261,5 @@ func handleInteractionEvent(interaction slack.InteractionCallback, client *slack
 
 	return nil
 }
+
+// Usage: make;docker run --rm slack-bot
